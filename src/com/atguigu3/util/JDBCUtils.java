@@ -3,6 +3,7 @@ package com.atguigu3.util;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Properties;
 
@@ -52,6 +53,30 @@ public class JDBCUtils {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
+	}
+	//¹Ø±Õ×ÊÔ´
+	public static void closeResource(Connection conn, Statement ps, ResultSet rs) {
+		try {
+			if(ps != null)
+				ps.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			if(conn != null)
+				conn.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			if(rs != null) {
+				rs.close();
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 }
