@@ -26,7 +26,7 @@ public class EmployeesForQuery {
 		Employees employees = queryForEmployees(sql,101);
 		System.out.println(employees);
 	}
-	/**
+	/***
 	 * 针对employees表的通用查询
 	 * @throws Exception 
 	 */
