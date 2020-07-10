@@ -1,9 +1,12 @@
 package com.atguigu3.preparedstatement.crud;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 import org.junit.Test;
 
@@ -16,7 +19,55 @@ import com.atguigu3.util.JDBCUtils;
  *
  */
 public class EmployeesForQuery {
-
+	
+	@Test
+	public void testqueryForEmployees() {
+		String sql = "select employee_id from employees where employee_id = ?";
+		Employees employees = queryForEmployees(sql,101);
+		System.out.println(employees);
+	}
+	/**
+	 * 针对employees表的通用查询
+	 * @throws Exception 
+	 */
+	public Employees queryForEmployees(String sql, Object ...args){
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			conn = JDBCUtils.getConnection();
+			ps = conn.prepareStatement(sql);
+			for(int i = 0; i < args.length; i++) {
+				ps.setObject(i+1, args[i]);
+			}
+			rs = ps.executeQuery();
+			//获取结果集的元数据
+			ResultSetMetaData rsmd = rs.getMetaData();
+			//通过ResultSetMetaData获取结果集中的列数
+			int columnCount = rsmd.getColumnCount();
+			if(rs.next()) {
+				Employees employees = new Employees();
+				//处理结果集一行数据中的每一列
+				for(int i = 0; i < columnCount; i++) {
+					//给Employees对象指定的某个属性，赋值为cloumnvalue
+					Object columnvalue = rs.getObject(i+1);
+					String columnName = rsmd.getColumnName(i+1);//获取每个列名
+					//给employees对象指定的columnName属性，赋值为columnValue：通过反射
+					Field field = Employees.class.getDeclaredField(columnName);//叫columnName的属性拿到
+					field.setAccessible(true);//防止私有不能赋值
+					field.set(employees, columnvalue);
+					
+				}
+				return employees;
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			
+			JDBCUtils.closeResource(conn, ps, rs);
+		}
+		return null;
+	}
 	@Test
 	public void testQuery1(){
 		Connection conn = null;
